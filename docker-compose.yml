@@ -1,0 +1,26 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: ecommerce-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ecommerce
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  backend:
+    build: .
+    container_name: ecommerce-backend
+    depends_on:
+      - db
+    environment:
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/ecommerce?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
